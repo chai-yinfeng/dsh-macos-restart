@@ -9,7 +9,7 @@ public artifact needs a public name and the publish fields below.
 | Field | Recommended |
 | --- | --- |
 | Public npm name | `dsh-macos-restart` (available at the time of writing) |
-| Version | `0.1.6` (first public release) |
+| Version | `0.1.7` (first public release) |
 | License | MIT |
 | GitHub repo | `https://github.com/chai-yinfeng/dsh-macos-restart` |
 | Catalog category | **UI Enhancements** (header/entry-point plugin; also fits Development & Runtime) |
