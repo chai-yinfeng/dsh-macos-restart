@@ -1,8 +1,21 @@
 # Publishing `dsh-restart`
 
-This package is currently a private local bundle (`@local/dsh-restart`). It can
-be published as a normal DSH plugin. The source stays development-named; the
-public artifact needs a public name and the publish fields below.
+This package is published as `dsh-macos-restart` on npm. The local development
+copy remains `@local/dsh-restart`; the public artifact is generated from it.
+
+## Current status (2026-10-22)
+
+- npm: **`dsh-macos-restart@0.1.7` is published and `latest`**.
+- GitHub: <https://github.com/chai-yinfeng/dsh-macos-restart> (public, 0.1.7,
+  bilingual `README.md` / `README.zh.md`).
+- Catalog: the entry is prepared on the fork branch
+  `chai-yinfeng/awesome-dsh-plugin:add-dsh-macos-restart`
+  (`data/plugins/chai-yinfeng__dsh-macos-restart.yml`, category `dev`).
+  The registry requires the plugin repo to be at least 1 day old; the repo was
+  created at `2026-10-22T04:47:37Z`, so the PR can be opened after
+  `2026-10-23T04:47:37Z`.
+  Compare URL:
+  <https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/compare/main...chai-yinfeng:add-dsh-macos-restart?expand=1>
 
 ## Prepared defaults (change them if you want)
 
