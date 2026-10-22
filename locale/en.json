@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Desktop Restart",
+    "description": "Restart DeepSeek Harness on macOS from the title-bar icon, the sidebar, Settings, or /restart-desktop, so plugins that cannot hot-reload take effect."
+  }
+}

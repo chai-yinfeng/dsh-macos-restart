@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "桌面版重启",
+    "description": "在 macOS 上从标题栏图标、侧栏、设置页或 /restart-desktop 一键重启 DeepSeek Harness，让无法热加载的插件生效。"
+  }
+}

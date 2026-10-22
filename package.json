@@ -1,0 +1,59 @@
+{
+  "name": "dsh-macos-restart",
+  "version": "0.1.5",
+  "private": false,
+  "description": "macOS Desktop only: one-click restart of the DeepSeek Harness Electron app from the title bar, sidebar, Settings, or /restart-desktop.",
+  "type": "module",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "lib/index.js",
+    "lib/client.js",
+    "lib/helper.sh",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-ui-settings"
+      ]
+    }
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chai-yinfeng/dsh-macos-restart.git"
+  },
+  "homepage": "https://github.com/chai-yinfeng/dsh-macos-restart",
+  "bugs": {
+    "url": "https://github.com/chai-yinfeng/dsh-macos-restart/issues"
+  },
+  "author": "chai-yinfeng",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "macos",
+    "desktop",
+    "restart"
+  ],
+  "engines": {
+    "dsh": ">=0.2.1-rc.2"
+  }
+}
