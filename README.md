@@ -1,5 +1,7 @@
 # macOS Desktop Restart (`dsh-macos-restart`)
 
+English | [中文](https://github.com/chai-yinfeng/dsh-macos-restart/blob/main/README.zh.md)
+
 macOS 桌面版一键重启 / One-click restart for the DeepSeek Harness desktop app.
 
 A macOS-only one-click restart for the **DeepSeek Harness desktop app**. It
@@ -43,8 +45,10 @@ same Host operation.
 2. The Host checks loopback/same-origin, that this is the macOS desktop host,
    that no plugin install/update is running, and whether a turn is running.
 3. The Host writes a handoff record and an initial `state.json`, then starts an
-   **independent opener** (via `launchctl submit` when available, otherwise a
-   detached `/bin/sh`). The opener only waits and opens; it never kills.
+   **independent one-shot opener** as a detached `/bin/sh`. The opener only
+   waits and opens; it never kills. Do not use `launchctl submit` for this: in
+   a real 0.1.4 test the submitted job restarted the opener every ~10s after
+   the app was back.
 4. The Host starts the killer helper. It sends SIGTERM to the **Electron main
    process only**. The desktop host exits through its own IPC-disconnect path,
    so session logs are checkpointed normally.
@@ -70,9 +74,10 @@ same Host operation.
 
 ## Safety
 
-- Only loopback requests are accepted. The desktop document proxy strips
-  `Host`/`Origin`, so the headerless loopback shape is accepted alongside a
-  same-origin browser request.
+- Only loopback requests are accepted. The desktop document proxy may strip both
+  `Host`/`Origin`, or only `Origin`; a loopback `Host` with no `Origin` is
+  accepted, and a present `Origin` must match `Host`. `sec-fetch-site:
+  cross-site` is rejected.
 - A running turn returns `409 busy`; the Client lists the affected session ids
   and asks for a second confirmation before sending `force: true`.
 - A plugin install/update returns `423` and cannot be forced.
@@ -96,10 +101,11 @@ same Host operation.
 - `lib/client.js` — title-bar icon, sidebar action, Settings page, modal,
   floating button, log actions.
 - `locale/{en,zh}.json` — Plugin Manager display metadata.
+- `README.zh.md` — Chinese README.
 - `PUBLISHING.md` — npm + curated-catalog release checklist.
 
 ## Publishing
 
-See [PUBLISHING.md](https://github.com/chai-yinfeng/dsh-macos-restart/blob/main/PUBLISHING.md). The current package name `dsh-macos-restart`
-is a local development name; the publishable artifact needs a public name
-(recommended: `dsh-macos-restart`) and an npm account.
+See [PUBLISHING.md](https://github.com/chai-yinfeng/dsh-macos-restart/blob/main/PUBLISHING.md).
+The current package name `dsh-macos-restart` is a local development name; the
+publishable artifact is `dsh-macos-restart` on npm.
