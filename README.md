@@ -1,5 +1,7 @@
 # macOS Desktop Restart (`dsh-macos-restart`)
 
+macOS 桌面版一键重启 / One-click restart for the DeepSeek Harness desktop app.
+
 A macOS-only one-click restart for the **DeepSeek Harness desktop app**. It
 handles the Electron app itself, not a `dsh web` host: the restart is for making
 plugins that cannot hot-reload load on the next launch.

@@ -9,11 +9,11 @@ public artifact needs a public name and the publish fields below.
 | Field | Recommended |
 | --- | --- |
 | Public npm name | `dsh-macos-restart` (available at the time of writing) |
-| Version | `0.1.5` (first public release) |
+| Version | `0.1.6` (first public release) |
 | License | MIT |
 | GitHub repo | `https://github.com/chai-yinfeng/dsh-macos-restart` |
 | Catalog category | **UI Enhancements** (header/entry-point plugin; also fits Development & Runtime) |
-| Short description | macOS Desktop only: one-click restart of the DeepSeek Harness Electron app from the title bar, sidebar, Settings, or `/restart-desktop`; confirms before interrupting running turns, refuses during plugin install/update, and records restart phases/logs. |
+| Short description | macOS 桌面版一键重启 / One-click restart for the DeepSeek Harness desktop app. |
 
 Do not publish under `@local/*`: that scope is a development placeholder.
 
@@ -95,7 +95,7 @@ registry. npm publication alone makes the package installable, not listed.
    adding one entry under **UI Enhancements** (or **Development & Runtime**):
 
    ```markdown
-   - [chai-yinfeng/dsh-macos-restart](https://github.com/chai-yinfeng/dsh-macos-restart) - macOS Desktop only: one-click restart of the DeepSeek Harness Electron app from the title bar, sidebar, Settings, or `/restart-desktop`; confirms before interrupting running turns, refuses during plugin install/update, and records restart phases/logs.
+   - [chai-yinfeng/dsh-macos-restart](https://github.com/chai-yinfeng/dsh-macos-restart) - macOS 桌面版一键重启 / One-click restart for the DeepSeek Harness desktop app; confirms running turns and blocks during plugin install/update.
    ```
 
 3. The site and market pick the entry up automatically, usually within a day.

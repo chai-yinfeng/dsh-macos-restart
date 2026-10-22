@@ -1,8 +1,8 @@
 {
   "name": "dsh-macos-restart",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "private": false,
-  "description": "macOS Desktop only: one-click restart of the DeepSeek Harness Electron app from the title bar, sidebar, Settings, or /restart-desktop.",
+  "description": "macOS 桌面版一键重启 / One-click restart for the DeepSeek Harness desktop app.",
   "type": "module",
   "exports": {
     ".": "./lib/index.js",
