@@ -5,9 +5,7 @@ copy remains `@local/dsh-restart`; the public artifact is generated from it.
 
 ## Current status (2026-10-22)
 
-- npm: `dsh-macos-restart@0.1.7` is `latest`; **0.2.5 is built and pushed to
-  GitHub, but npm publish is pending a fresh `npm login`** (the CLI token
-  expired after the 0.1.7 release).
+- npm: **`dsh-macos-restart@0.2.5` is published and `latest`**.
 - GitHub: <https://github.com/chai-yinfeng/dsh-macos-restart> (public, 0.2.5,
   bilingual `README.md` / `README.zh.md`).
 - Catalog: the entry is prepared on the fork branch
