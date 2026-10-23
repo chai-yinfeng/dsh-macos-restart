@@ -64,13 +64,22 @@ same Host operation.
 - `~/.dsh/dsh-restart/state.json` records the last restart's phase:
   `queued → opener-started/killing → waiting-host → host-exited →
   waiting-port → port-free → opening → opened` (or `failed`).
-- Settings shows the last phase/time and has **Open log folder** and
-  **Reveal latest log** buttons. `POST /plugins/dsh-restart/open-logs` does the
-  same from the Host, so it works even when the page has lost its connection.
-  The file button uses `open -R` (Finder reveal) because plain `open <file>.log`
-  depends on a default application and can look like a no-op.
+- Settings shows the last phase/time and one **Reveal latest log** button.
+  `POST /plugins/dsh-restart/open-logs` does the same from the Host, so it works
+  even when the page has lost its connection. It uses `open -R` (Finder reveal)
+  because plain `open <file>.log` depends on a default application and can look
+  like a no-op.
 - The helper log contains the process-level account; the state file is the
   short version that survives a torn-down process tree.
+
+## Stuck install recovery
+
+If the plugin manager holds its install lock with no pnpm/install progress for
+five minutes, `pluginOperation.stale` becomes true and the dialog offers
+**Force restart (advanced)**. It is only available while the lock belongs to
+the current host, or when no manager lock exists at all; a live pnpm process is
+never bypassed. A force restart kills the host, releases the lock, and reopens
+the app — an unfinished install is interrupted.
 
 ## Safety
 
@@ -80,7 +89,8 @@ same Host operation.
   cross-site` is rejected.
 - A running turn returns `409 busy`; the Client lists the affected session ids
   and asks for a second confirmation before sending `force: true`.
-- A plugin install/update returns `423` and cannot be forced.
+- A plugin install/update returns `423`. The only exception is the explicit
+  advanced force path for a stale manager lock described above.
 - `allowRestart: false` in `cordis.patch.yml` disables the operation.
 - The plugin never modifies `app.asar` and never starts a second server.
 

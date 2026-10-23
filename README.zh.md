@@ -38,14 +38,18 @@ macOS 桌面版一键重启：让无法热加载的插件在下次启动时生�
 ## 诊断
 
 - `~/.dsh/dsh-restart/state.json` 记录上次重启的阶段：`queued → opener-started/killing → waiting-host → host-exited → waiting-port → port-free → opening → opened`（或 `failed`）。
-- 设置页显示上次阶段/时间，并提供 **打开日志目录** 和 **在 Finder 中显示最近日志**。`POST /plugins/dsh-restart/open-logs` 从 Host 做同样的事，所以页面断开后也能用。文件按钮使用 `open -R`（Finder 显示），因为直接 `open <file>.log` 依赖默认应用，可能看起来没反应。
+- 设置页显示上次阶段/时间，并提供一个 **在 Finder 中显示最近日志** 按钮。`POST /plugins/dsh-restart/open-logs` 从 Host 做同样的事，所以页面断开后也能用。它使用 `open -R`（Finder 显示并定位），因为直接 `open <file>.log` 依赖默认应用，可能看起来没反应。
 - helper 日志包含进程级记录；state 文件是进程树被清理后仍能保留的简要版本。
+
+## 卡住的安装恢复
+
+如果插件管理器持有安装锁、且五分钟内没有任何 pnpm/安装进展，状态会变成 `pluginOperation.stale`，弹窗会出现 **强制重启（高级）**。这个入口只在锁属于当前 host，或根本没有 manager 锁时出现；不会绕过仍在运行的 pnpm 进程。强制重启会结束 host、释放锁并重开应用，未完成的安装会被中断。
 
 ## 安全
 
 - 只接受 loopback 请求。桌面文档代理可能同时去掉 `Host`/`Origin`，也可能只去掉 `Origin`；loopback `Host` 且没有 `Origin` 会被接受，带 `Origin` 时必须与 `Host` 匹配。`sec-fetch-site: cross-site` 会被拒绝。
 - 有任务运行时返回 `409 busy`；客户端列出受影响的会话 id，并要求二次确认后才发送 `force: true`。
-- 插件安装/更新中返回 `423`，不可强制。
+- 插件安装/更新中返回 `423`；唯一例外是上面描述的“stale manager 锁”高级强制路径。
 - `cordis.patch.yml` 里 `allowRestart: false` 可完全禁用。
 - 插件不修改 `app.asar`，也不会启动第二个服务器。
 

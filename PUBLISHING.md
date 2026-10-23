@@ -22,7 +22,7 @@ copy remains `@local/dsh-restart`; the public artifact is generated from it.
 | Field | Recommended |
 | --- | --- |
 | Public npm name | `dsh-macos-restart` (available at the time of writing) |
-| Version | `0.1.7` (first public release) |
+| Version | `0.1.8` |
 | License | MIT |
 | GitHub repo | `https://github.com/chai-yinfeng/dsh-macos-restart` |
 | Catalog category | **UI Enhancements** (header/entry-point plugin; also fits Development & Runtime) |
