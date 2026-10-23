@@ -1,6 +1,6 @@
 {
   "name": "dsh-macos-restart",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "private": false,
   "description": "macOS 桌面版一键重启 / One-click restart for the DeepSeek Harness desktop app.",
   "type": "module",

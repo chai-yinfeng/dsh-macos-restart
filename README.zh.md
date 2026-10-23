@@ -31,7 +31,7 @@ macOS 桌面版一键重启：让无法热加载的插件在下次启动时生�
 1. 客户端向 `POST /plugins/dsh-restart/restart` 发送 `{ "confirm": true }`。
 2. Host 检查请求是否来自 loopback/同源、当前是否为 macOS 桌面 host、是否有插件安装/更新在跑、是否有任务在运行。
 3. Host 写 handoff 记录和初始 `state.json`，然后启动一个**独立的 one-shot opener**（detached `/bin/sh`）。opener 只等待和打开，不杀进程。不要使用 `launchctl submit`：0.1.4 真机测试中，这个 job 会在应用回来后每约 10 秒重复拉起 opener。
-4. Host 启动 killer helper。它只向 **Electron 主进程** 发送 SIGTERM。桌面 host 通过自己的 IPC 断开路径退出，会话日志会正常落盘。
+4. Host 启动 killer helper。它用 SIGKILL 结束 **Electron 主进程**，而不是普通退出。普通退出会让应用弹出自己的“定时任务将不会运行”确认框，而桌面版没有给插件留优雅重启通道。host 是独立子进程，会看到 IPC 通道关闭并走自己的优雅关闭，所以会话日志仍会落盘。代价是主进程自己的窗口/托盘清理不会执行；插件自己的弹窗会显示定时任务警告。
 5. opener/killer 等待旧主进程消失、旧 web 端口释放，然后执行 `open -a "/Applications/DeepSeek Harness.app"`。`open -a` 对已在运行的应用只是激活，所以两个 helper 不会启动两个实例。
 6. 如果 host 拒绝退出，会升级处理。失败时弹窗提示，日志在 `~/.dsh/dsh-restart/`。
 

@@ -273,21 +273,20 @@ if [ -z "$M" ]; then
     kill -KILL "$p" 2>/dev/null || true
   done
 else
-  log "sending SIGTERM to Electron main pid $M"
-  state_write "killing" "sigterm-main"
-  kill -TERM "$M" 2>/dev/null || true
+  # SIGTERM makes the Electron main process run its ordinary quit path, which
+  # shows the app's own "quit with scheduled tasks?" confirmation. There is no
+  # plugin-facing graceful restart channel, so a one-click restart must end the
+  # main process directly. The host is a separate child: it sees the IPC channel
+  # close and runs its own graceful shutdown, so session logs still land. The
+  # trade-off is that the main process's window/tray cleanup is skipped.
+  log "force-ending Electron main pid $M (bypasses the app quit confirmation; host exits via IPC disconnect)"
+  state_write "killing" "sigkill-main"
+  kill -KILL "$M" 2>/dev/null || true
 
   # The host normally exits within a few seconds once its IPC channel drops.
   state_write "waiting-host" ""
   if ! wait_hosts_gone 40; then
-    log "host still alive after 20s; sending SIGKILL to Electron main pid $M"
-    state_write "escalated" "sigkill-main"
-    kill -KILL "$M" 2>/dev/null || true
-    wait_hosts_gone 20 || true
-  fi
-
-  if hosts_alive; then
-    log "host still alive after escalation; stopping host processes"
+    log "host still alive 20s after the main process was killed; stopping host processes"
     state_write "escalated" "stopping-host"
     for p in $(host_pids); do
       kill -TERM "$p" 2>/dev/null || true
