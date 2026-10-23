@@ -40,6 +40,7 @@ LOG="${5:-}"
 HOST_PID="${6:-0}"
 STATE="${7:-}"
 RESTART_ID="${8:-}"
+FORCE_KILL="${9:-0}"
 
 log() {
   printf '[%s] %s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$*"
@@ -273,30 +274,44 @@ if [ -z "$M" ]; then
     kill -KILL "$p" 2>/dev/null || true
   done
 else
-  # SIGTERM makes the Electron main process run its ordinary quit path, which
-  # shows the app's own "quit with scheduled tasks?" confirmation. There is no
-  # plugin-facing graceful restart channel, so a one-click restart must end the
-  # main process directly. The host is a separate child: it sees the IPC channel
-  # close and runs its own graceful shutdown, so session logs still land. The
-  # trade-off is that the main process's window/tray cleanup is skipped.
-  log "force-ending Electron main pid $M (bypasses the app quit confirmation; host exits via IPC disconnect)"
-  state_write "killing" "sigkill-main"
-  kill -KILL "$M" 2>/dev/null || true
+  if [ "$FORCE_KILL" = "1" ]; then
+    # Explicit advanced path only (a stuck manager). This bypasses the app's
+    # quit confirmation, which also means the main process may skip its final
+    # account/session flush. The host still exits through IPC disconnect.
+    log "force-ending Electron main pid $M (advanced: bypasses the app quit confirmation)"
+    state_write "killing" "sigkill-main"
+    kill -KILL "$M" 2>/dev/null || true
 
-  # The host normally exits within a few seconds once its IPC channel drops.
-  state_write "waiting-host" ""
-  if ! wait_hosts_gone 40; then
-    log "host still alive 20s after the main process was killed; stopping host processes"
-    state_write "escalated" "stopping-host"
-    for p in $(host_pids); do
-      kill -TERM "$p" 2>/dev/null || true
-    done
-    sleep 2
-    for p in $(host_pids); do
-      log "force stopping host pid $p"
-      kill -KILL "$p" 2>/dev/null || true
-    done
-    sleep 1
+    # The host normally exits within a few seconds once its IPC channel drops.
+    state_write "waiting-host" ""
+    if ! wait_hosts_gone 40; then
+      log "host still alive 20s after the main process was killed; stopping host processes"
+      state_write "escalated" "stopping-host"
+      for p in $(host_pids); do
+        kill -TERM "$p" 2>/dev/null || true
+      done
+      sleep 2
+      for p in $(host_pids); do
+        log "force stopping host pid $p"
+        kill -KILL "$p" 2>/dev/null || true
+      done
+      sleep 1
+    fi
+  else
+    # Default: ordinary quit. The app shows its own quit confirmation when
+    # scheduled tasks or other interruptible work exist; choosing Quit is what
+    # lets the main process flush account/session state. We never escalate to
+    # SIGKILL here: Cancel must really cancel, and an unanswered dialog must
+    # not silently corrupt the next boot.
+    log "sending SIGTERM to Electron main pid $M (the app may show its own quit confirmation; choose Quit to save state)"
+    state_write "killing" "sigterm-main"
+    kill -TERM "$M" 2>/dev/null || true
+    state_write "waiting-host" ""
+    if ! wait_hosts_gone 600; then
+      log "app did not exit after 5 minutes; leaving it running (quit cancelled or unanswered)"
+      state_write "cancelled" "app-did-not-exit"
+      exit 4
+    fi
   fi
 fi
 

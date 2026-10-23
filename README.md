@@ -49,13 +49,14 @@ same Host operation.
    waits and opens; it never kills. Do not use `launchctl submit` for this: in
    a real 0.1.4 test the submitted job restarted the opener every ~10s after
    the app was back.
-4. The Host starts the killer helper. It ends the **Electron main process** with
-   SIGKILL instead of an ordinary quit. SIGTERM makes the app show its own
-   "quit with scheduled tasks?" confirmation, and there is no plugin-facing
-   graceful restart channel. The host is a separate child: it sees the IPC
-   channel close and runs its own graceful shutdown, so session logs still land.
-   The trade-off is that the main process's window/tray cleanup is skipped; the
-   plugin's own dialog shows the scheduled-task warning instead.
+4. The Host starts the killer helper. It sends SIGTERM to the **Electron main
+   process**. The app may show its own quit confirmation for scheduled tasks;
+   choosing Quit lets it flush account/session state. The host is a separate
+   child: it sees the IPC channel close and runs its own graceful shutdown, so
+   session logs still land. The helper never escalates a normal restart to
+   SIGKILL — Cancel must really cancel, and an unanswered dialog must not be
+   silently killed. Only the explicit stale-manager **advanced** path uses
+   SIGKILL, with its own warning.
 5. The opener/killer wait for the old main process to disappear and for the web
    port to be released, then run `open -a "/Applications/DeepSeek Harness.app"`.
    `open -a` on an already-running app activates it, so the two helpers cannot
@@ -83,7 +84,9 @@ five minutes, `pluginOperation.stale` becomes true and the dialog offers
 **Force restart (advanced)**. It is only available while the lock belongs to
 the current host, or when no manager lock exists at all; a live pnpm process is
 never bypassed. A force restart kills the host, releases the lock, and reopens
-the app — an unfinished install is interrupted.
+the app — an unfinished install is interrupted, and because it bypasses the
+app's own quit confirmation the main process may skip its final account/window
+state flush. Use it only when the manager is actually stuck.
 
 ## Safety
 
