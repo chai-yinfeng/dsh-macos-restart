@@ -5,17 +5,16 @@ copy remains `@local/dsh-restart`; the public artifact is generated from it.
 
 ## Current status (2026-10-22)
 
-- npm: `dsh-macos-restart@0.1.7` is `latest`; **0.2.0 is built and pushed to
+- npm: `dsh-macos-restart@0.1.7` is `latest`; **0.2.5 is built and pushed to
   GitHub, but npm publish is pending a fresh `npm login`** (the CLI token
   expired after the 0.1.7 release).
-- GitHub: <https://github.com/chai-yinfeng/dsh-macos-restart> (public, 0.2.0,
+- GitHub: <https://github.com/chai-yinfeng/dsh-macos-restart> (public, 0.2.5,
   bilingual `README.md` / `README.zh.md`).
 - Catalog: the entry is prepared on the fork branch
   `chai-yinfeng/awesome-dsh-plugin:add-dsh-macos-restart`
   (`data/plugins/chai-yinfeng__dsh-macos-restart.yml`, category `dev`).
-  The registry requires the plugin repo to be at least 1 day old; the repo was
-  created at `2026-10-22T04:47:37Z`, so the PR can be opened after
-  `2026-10-23T04:47:37Z`.
+  The 1-day repository-age rule is satisfied. The automatic PR reminder was
+  cancelled; open the PR after npm 0.2.5 is published.
   Compare URL:
   <https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/compare/main...chai-yinfeng:add-dsh-macos-restart?expand=1>
 
@@ -24,7 +23,7 @@ copy remains `@local/dsh-restart`; the public artifact is generated from it.
 | Field | Recommended |
 | --- | --- |
 | Public npm name | `dsh-macos-restart` (available at the time of writing) |
-| Version | `0.2.0` |
+| Version | `0.2.5` |
 | License | MIT |
 | GitHub repo | `https://github.com/chai-yinfeng/dsh-macos-restart` |
 | Catalog category | **Development & Runtime** (`dev`; the prepared entry uses it) |

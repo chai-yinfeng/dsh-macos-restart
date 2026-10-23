@@ -55,13 +55,18 @@ same Host operation.
    child: it sees the IPC channel close and runs its own graceful shutdown, so
    session logs still land. The helper never escalates a normal restart to
    SIGKILL — Cancel must really cancel, and an unanswered dialog must not be
-   silently killed. Only the explicit stale-manager **advanced** path uses
-   SIGKILL, with its own warning.
+   silently killed. If the **main process** is still alive 3 seconds after
+   SIGTERM, the helper records `cancelled`, the opener exits without opening,
+   and the UI shows **Restart cancelled**. If the main already exited and only
+   the old host is still flushing, the helper waits for the host without
+   cancelling — the opener may have already relaunched the app. Only the
+   explicit stale-manager **advanced** path uses SIGKILL, with its own warning.
 5. The opener/killer wait for the old main process to disappear and for the web
    port to be released, then run `open -a "/Applications/DeepSeek Harness.app"`.
    `open -a` on an already-running app activates it, so the two helpers cannot
    start two instances.
-6. If the host refuses to exit it is escalated. Failure is reported with a
+6. A normal restart that does not exit is cancelled, not escalated; only the
+   explicit stale-manager force path escalates. Failure is reported with a
    dialog and a log under `~/.dsh/dsh-restart/`.
 
 ## Diagnostics

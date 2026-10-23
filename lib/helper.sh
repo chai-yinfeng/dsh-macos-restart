@@ -215,6 +215,10 @@ if [ "$OPENER" = "1" ]; then
   state_write "waiting-old-main" ""
   i=0
   while [ "$i" -lt 120 ]; do
+    if [ "$(current_phase)" = "cancelled" ]; then
+      log "the restart was cancelled; opener exiting without opening"
+      exit 0
+    fi
     M_NOW="$(main_pids | /usr/bin/head -n 1)"
     if [ -n "$M_NOW" ] && [ "$M_NOW" != "$MAIN_HINT" ]; then
       log "app already back as ${M_NOW}; nothing to open"
@@ -307,10 +311,19 @@ else
     state_write "killing" "sigterm-main"
     kill -TERM "$M" 2>/dev/null || true
     state_write "waiting-host" ""
-    if ! wait_hosts_gone 600; then
-      log "app did not exit after 5 minutes; leaving it running (quit cancelled or unanswered)"
-      state_write "cancelled" "app-did-not-exit"
-      exit 4
+    if ! wait_hosts_gone 6; then
+      # The main process is the quit decision point. If it is still alive, the
+      # user cancelled (or never answered) the app's confirmation. If it is
+      # already gone, the quit was confirmed; the old host may simply still be
+      # flushing, and cancelling here would be a false negative after the
+      # opener has already relaunched the app.
+      if kill -0 "$M" 2>/dev/null; then
+        log "main still alive 3s after SIGTERM; treating the quit confirmation as cancelled"
+        state_write "cancelled" "quit-cancelled"
+        exit 4
+      fi
+      log "main exited but the old host is still shutting down; waiting without cancelling"
+      wait_hosts_gone 40 || true
     fi
   fi
 fi

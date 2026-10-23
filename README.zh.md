@@ -31,9 +31,9 @@ macOS 桌面版一键重启：让无法热加载的插件在下次启动时生�
 1. 客户端向 `POST /plugins/dsh-restart/restart` 发送 `{ "confirm": true }`。
 2. Host 检查请求是否来自 loopback/同源、当前是否为 macOS 桌面 host、是否有插件安装/更新在跑、是否有任务在运行。
 3. Host 写 handoff 记录和初始 `state.json`，然后启动一个**独立的 one-shot opener**（detached `/bin/sh`）。opener 只等待和打开，不杀进程。不要使用 `launchctl submit`：0.1.4 真机测试中，这个 job 会在应用回来后每约 10 秒重复拉起 opener。
-4. Host 启动 killer helper。它向 **Electron 主进程** 发送 SIGTERM。应用可能会弹出自己的退出确认（定时任务）；点“退出”会让它保存账号/会话状态。host 是独立子进程，会看到 IPC 通道关闭并走自己的优雅关闭，所以会话日志仍会落盘。正常重启不会升级到 SIGKILL——取消必须真的取消，未回答的弹窗也不能被静默强杀。只有显式的 stale-manager **高级**路径会用 SIGKILL，并带自己的警告。
+4. Host 启动 killer helper。它向 **Electron 主进程** 发送 SIGTERM。应用可能会弹出自己的退出确认（定时任务）；点“退出”会让它保存账号/会话状态。host 是独立子进程，会看到 IPC 通道关闭并走自己的优雅关闭，所以会话日志仍会落盘。正常重启不会升级到 SIGKILL——取消必须真的取消，未回答的弹窗也不能被静默强杀。如果 SIGTERM 后 3 秒 **主进程** 仍活着，helper 会记录 `cancelled`，opener 不打开，弹窗显示 **重启已取消**。如果主进程已经退出、只是旧 host 还在落盘，helper 会继续等 host，不记为取消——此时 opener 可能已经把应用重新拉起来了。只有显式的 stale-manager **高级**路径会用 SIGKILL，并带自己的警告。
 5. opener/killer 等待旧主进程消失、旧 web 端口释放，然后执行 `open -a "/Applications/DeepSeek Harness.app"`。`open -a` 对已在运行的应用只是激活，所以两个 helper 不会启动两个实例。
-6. 如果 host 拒绝退出，会升级处理。失败时弹窗提示，日志在 `~/.dsh/dsh-restart/`。
+6. 正常重启如果 host 不退出，会取消而不是升级；只有显式的 stale-manager 强制路径会升级。失败时弹窗提示，日志在 `~/.dsh/dsh-restart/`。
 
 ## 诊断
 
